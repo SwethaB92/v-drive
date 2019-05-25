@@ -1,7 +1,7 @@
 const express = require ('express')
 const router = express.Router()
 
-const { usersRouter } = require('../app/controllers/UsersController')
+const { usersRouter } = require('../app/controllers/Userscontroller')
 const {adminRouter} = require('../app/controllers/AdminController')
 
 router.use('/users', usersRouter)
