@@ -6,7 +6,7 @@ const { authenticateUser } = require('../middlewares/authentication')
 const { authorizeUser } = require('../middlewares/authorization')
 
 router.post('/register',function(req,res){
-    const body = _.pick(req.body,['username','email','password','addresses'])
+    const body = _.pick(req.body,['username','email','password'])
     const user = new User(body)
     user.save()
         .then(function(user){
@@ -14,13 +14,15 @@ router.post('/register',function(req,res){
         })
         .catch(function(err){
              res.send(err)
+             console.log(err)
         })
       
 })
 
 router.post('/login', function (req, res) {
     const body = req.body
-    User.findByCredentials(body.usernameOrEmail, body.password)
+    console.log('body',body)
+    User.findByCredentials(body.email, body.password)
         .then(function (user) {
             return user.generateToken()
         })
@@ -35,9 +37,9 @@ router.post('/login', function (req, res) {
 
 
 router.get('/',authenticateUser,function(req,res){
-    User.findById(req.user._id)  
-         .then(function(user){
-             res.send(user)
+    User.find()  
+         .then(function(users){
+             res.send(users)
          })
          .catch(function(err){
              res.send(err)
