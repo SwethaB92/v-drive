@@ -62,65 +62,35 @@ allowAccess:{
 }
 })
 
-userSchema.statics.findByCredentials = function (usernameOrEmail, password) {
+userSchema.statics.findByCredentials = function(email, password){
     const User = this
-    if(validator.isEmail(usernameOrEmail)){
-        return User.findOne({ email:usernameOrEmail })
-        .then(function (user) {
-            if (!user) {
-                return Promise.reject('invalid email / password')
-            }
-            else if(!user.allowAccess)
-            {
-                return Promise.reject({
-                    notice:'User is not allowed to login'
-                })
-            }
-            return bcryptjs.compare(password, user.password)
-                .then(function (result) {
-                    if (result) {
-                        return Promise.resolve(user)
-                        
-                    } else {
-                        return Promise.reject('invalid email / password ')
+    console.log('Email', User.findOne({ email }) ) 
+    return User.findOne({ email })
+                .then(function(user){
+                    console.log('user', user)
+                    if(!user) {
+                        console.log('invalid User')
+                        return Promise.reject('invalid email / password')
                     }
+
+                    return bcryptjs.compare(password, user.password)
+                                .then(function(result){
+                                    if(result) {
+                                        return Promise.resolve(user)
+                                        // return new Promise(function(resolve, reject){
+                                        //     resolve(user)
+                                        // })
+                                    } else {
+                                        return Promise.reject({errors: 'invalid email / password '})
+                                    }
+                                })
                 })
-        })
-        .catch(function (err) {
-            return Promise.reject(err)
-            
-        })
-    }
-    else{
-        return User.findOne({ username:usernameOrEmail })
-        .then(function (user) {
-            if (!user) {
-                return Promise.reject('invalid email / password')
-            }
-            else if(!user.allowAccess)
-            {
-                return Promise.reject({
-                    notice:'User is not allowed to login'
+                .catch(function(err){
+                    return Promise.reject(err)
+                    // return new Promise(function(resolve, reject){
+                    //  reject(err) 
+                    // })
                 })
-            }
-            return bcryptjs.compare(password, user.password)
-                .then(function (result) {
-                    if (result) {
-                        return Promise.resolve(user)
-                        // return new Promise(function(resolve, reject){
-                        //     resolve(user)
-                        // })
-                    } else {
-                        return Promise.reject('invalid email / password ')
-                    }
-                })
-        })
-        .catch(function (err) {
-            return Promise.reject(err)
-            
-        })
-    }
-    
 }
 
 userSchema.statics.findByToken = function (token) {
